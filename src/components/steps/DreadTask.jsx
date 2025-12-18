@@ -1,7 +1,21 @@
 import { useState, useRef, useEffect } from 'react'
 
+const TOOL_KEYWORDS = [
+  'hubspot', 'stripe', 'airtable', 'spreadsheet', 'excel', 'sheets', 'google sheets',
+  'email', 'gmail', 'outlook', 'crm', 'slack', 'notion', 'zapier', 'calendar',
+  'trello', 'asana', 'quickbooks', 'xero', 'mailchimp', 'salesforce', 'zoom',
+  'invoice', 'shopify', 'squarespace', 'wordpress', 'wix', 'typeform', 'jotform',
+  'docusign', 'dropbox', 'drive', 'clickup', 'monday', 'freshbooks', 'wave',
+  'gusto', 'square', 'paypal', 'venmo', 'twilio', 'intercom', 'zendesk'
+]
+
 export default function DreadTask({ value, hoursPerWeek, onChange, onHoursChange, onNext, canProceed }) {
   const inputRef = useRef(null)
+
+  const hasToolMention = TOOL_KEYWORDS.some(tool =>
+    value.toLowerCase().includes(tool)
+  )
+  const showNudge = value.length > 10 && value.length < 60 && !hasToolMention
 
   useEffect(() => {
     inputRef.current?.focus()
@@ -49,6 +63,19 @@ export default function DreadTask({ value, hoursPerWeek, onChange, onHoursChange
         <div className="flex justify-between mt-2 text-xs text-navy-400">
           <span>{value.length < 10 ? `${10 - value.length} more characters needed` : 'Looking good!'}</span>
           <span>{value.length}/500</span>
+        </div>
+
+        {/* Specificity nudge */}
+        <div
+          className={`flex items-start gap-2.5 text-sm text-amber-700 bg-amber-50
+                     border border-amber-200 rounded-lg px-4 py-3 mt-3
+                     transition-all duration-300 overflow-hidden
+                     ${showNudge ? 'opacity-100 max-h-24' : 'opacity-0 max-h-0 py-0 mt-0 border-0'}`}
+        >
+          <span className="text-amber-500 mt-0.5">💡</span>
+          <span>
+            <strong>Tip:</strong> Mentioning specific tools (like "HubSpot", "spreadsheets", or "Stripe") helps us give more actionable recommendations.
+          </span>
         </div>
       </div>
 
