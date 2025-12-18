@@ -221,7 +221,7 @@ export default function Results({ data, onRestart }) {
                       {roadmap?.step3_freedom?.title || "The Freedom Phase"}
                     </h4>
                     <span className="text-xs bg-navy-900 text-cream-50 px-3 py-1 rounded-full font-semibold">
-                      90 Days
+                      30 Days
                     </span>
                   </div>
                   <p className="text-navy-600 mb-4 leading-relaxed">{roadmap?.step3_freedom?.description}</p>

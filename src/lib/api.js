@@ -53,7 +53,7 @@ export async function getAnalysis(wizardData) {
       callAgenda: [
         `Review your ${wizardData.timeAudit || 'workflow'} and map automation opportunities`,
         "Identify quick wins for immediate implementation",
-        "Outline 90-day roadmap priorities"
+        "Outline 30-day roadmap priorities"
       ]
     }
   }

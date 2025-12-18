@@ -74,7 +74,7 @@ Generate JSON (no markdown). Focus on QUALITATIVE insights only - numbers will b
     },
     "step3_freedom": {
       "title": "Short title",
-      "description": "90-day realistic outcome",
+      "description": "30-day realistic outcome",
       "futureState": "Use qualified language: 'reduced time on', 'streamlined', 'more time for'. NO absolutes like 'zero hours' or '10x'"
     }
   },
@@ -140,7 +140,7 @@ CRITICAL: Do NOT output any numeric values - they are calculated server-side. Fo
           step2_multiplier: { title: "The Growth Multiplier", description: "Build systems for increased capacity", impact: "Positioned for more volume without proportional time increase" },
           step3_freedom: { title: "The Freedom Phase", description: "Streamlined operations", futureState: `Reduced time on ${timeAudit}, more focus on strategic work` }
         },
-        callAgenda: [`Review your ${timeAudit} workflow`, "Identify quick automation wins", "Map 90-day implementation"]
+        callAgenda: [`Review your ${timeAudit} workflow`, "Identify quick automation wins", "Map 30-day implementation"]
       }
     }
 
@@ -156,7 +156,7 @@ CRITICAL: Do NOT output any numeric values - they are calculated server-side. Fo
         step3_freedom: llmData.roadmap?.step3_freedom || {}
       },
       roi: enforcedRoi, // ENFORCED - all server-calculated
-      callAgenda: llmData.callAgenda || [`Review your ${timeAudit} workflow`, "Map 90-day plan", "Identify quick wins"]
+      callAgenda: llmData.callAgenda || [`Review your ${timeAudit} workflow`, "Map 30-day plan", "Identify quick wins"]
     }
 
     return res.json(finalResponse)

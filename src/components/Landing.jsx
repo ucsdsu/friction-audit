@@ -22,7 +22,7 @@ export default function Landing({ onStart }) {
 
           <div className="hidden sm:flex items-center gap-2 text-sm text-navy-500">
             <span className="w-2 h-2 bg-growth-500 rounded-full animate-pulse-subtle" />
-            <span>2-minute diagnostic</span>
+            <span>Instant analysis</span>
           </div>
         </div>
       </header>
@@ -34,19 +34,18 @@ export default function Landing({ onStart }) {
           <div className="mb-8 animate-fade-in">
             <span className="inline-flex items-center gap-2 text-sm font-medium text-navy-600 tracking-wide uppercase">
               <span className="w-8 h-px bg-navy-300" />
-              For Business Owners Who Feel Underwater
+              For Growing Businesses
             </span>
           </div>
 
           {/* Headline */}
           <h1 className="font-display text-display-lg md:text-display-xl text-navy-900 mb-8 animate-slide-up">
-            Stop Being the <span className="underline-accent">Logjam</span> in Your Own Success.
+            Scale Your Revenue, <span className="underline-accent">Not Your Headcount.</span>
           </h1>
 
           {/* Subheadline */}
           <p className="text-xl md:text-2xl text-navy-600 leading-relaxed max-w-3xl mb-12 animate-slide-up stagger-1" style={{ opacity: 0 }}>
-            Most businesses don't break because they lack sales.
-            They break because they lack an <span className="font-semibold text-navy-800">Operating System</span>.
+            You can't grow if you're the one doing all the work. We analyze your workflow to find exactly where <span className="font-semibold text-navy-800">AI tools can replace expensive manual labor</span>—giving you an operating system that runs without you.
           </p>
 
           {/* The 3-step bridge */}
@@ -54,18 +53,18 @@ export default function Landing({ onStart }) {
             {[
               {
                 step: '01',
-                title: 'Diagnose',
-                desc: 'Pinpoint the invisible bottleneck — Human, Process, or Tech.',
+                title: 'Identify',
+                desc: 'Find the specific "grunt work" tasks silently capping your monthly revenue.',
               },
               {
                 step: '02',
-                title: 'Architect',
-                desc: 'See exactly how AI agents can take 20+ hours off your plate.',
+                title: 'Automate',
+                desc: 'See how AI agents can execute sales & ops tasks 24/7—for a fraction of hiring costs.',
               },
               {
                 step: '03',
-                title: 'Implement',
-                desc: 'Get a ready-to-build blueprint for your "Founder OS."',
+                title: 'Delegate',
+                desc: 'Get a custom blueprint to remove yourself from the day-to-day grind.',
               },
             ].map((item, i) => (
               <div key={i} className="group">
@@ -85,14 +84,14 @@ export default function Landing({ onStart }) {
               onClick={onStart}
               className="btn-primary text-lg group"
             >
-              Take the Friction Audit
+              Start Your Audit
               <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
               </svg>
             </button>
 
             <p className="mt-4 text-sm text-navy-400">
-              Free • 2 minutes • No email required to start
+              Free • 2 minutes • Instant analysis
             </p>
           </div>
 
@@ -101,18 +100,18 @@ export default function Landing({ onStart }) {
             <div className="grid grid-cols-3 gap-8 max-w-2xl">
               <div>
                 <p className="font-display text-3xl font-semibold text-navy-900">4</p>
-                <p className="text-sm text-navy-500 mt-1">Quick questions</p>
+                <p className="text-sm text-navy-500 mt-1">Operational questions</p>
               </div>
               <div>
-                <p className="font-display text-3xl font-semibold text-navy-900">3</p>
-                <p className="text-sm text-navy-500 mt-1">Bottleneck types identified</p>
+                <p className="font-display text-3xl font-semibold text-navy-900">1</p>
+                <p className="text-sm text-navy-500 mt-1">Growth blocker found</p>
               </div>
               <div>
-                <p className="font-display text-3xl font-semibold text-navy-900">90-day</p>
-                <p className="text-sm text-navy-500 mt-1">Actionable roadmap</p>
+                <p className="font-display text-3xl font-semibold text-navy-900">30-day</p>
+                <p className="text-sm text-navy-500 mt-1">Automation roadmap</p>
               </div>
             </div>
-            <p className="text-xs text-navy-400 mt-8">Results vary based on your inputs and business context.</p>
+            <p className="text-xs text-navy-400 mt-8">Results tailored to your current team size and revenue.</p>
           </div>
         </div>
       </main>
