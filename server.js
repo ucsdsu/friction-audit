@@ -23,80 +23,69 @@ app.post('/api/analyze', async (req, res) => {
     return res.status(500).json({ error: 'GEMINI_API_KEY not set' })
   }
 
-  const revenueValues = {
-    'under-5k': 3000, '5k-10k': 7500, '10k-25k': 17500, '25k-50k': 37500, '50k-plus': 75000
+  // Revenue bracket midpoints (disclosed in UI)
+  const revenueLabels = {
+    'under-5k': { midpoint: 3000, label: 'Under $5k' },
+    '5k-10k': { midpoint: 7500, label: '$5k-$10k' },
+    '10k-25k': { midpoint: 17500, label: '$10k-$25k' },
+    '25k-50k': { midpoint: 37500, label: '$25k-$50k' },
+    '50k-plus': { midpoint: 75000, label: '$50k+' }
   }
-  const currentRevenueValue = revenueValues[currentRevenue] || 10000
-  const goalRevenueValue = revenueValues[goalRevenue] || 25000
+  const currentRevenueValue = revenueLabels[currentRevenue]?.midpoint || 10000
+  const goalRevenueValue = revenueLabels[goalRevenue]?.midpoint || 25000
   const hourlyValue = Math.round(currentRevenueValue / 160)
+
+  // Enforce hours - user's reported value only
+  const hoursRecoverable = Math.min(Math.round(userHours * 0.7), userHours) // max 70% recoverable
+  const monthlyCost = userHours * 4 * hourlyValue
+  const projectedSavings = Math.round(monthlyCost * 0.5) // conservative 50%
 
   const capacityMsg = capacityTest === 'grow' 
     ? 'They said "Grow" - they need MORE leads, indicating a SALES bottleneck'
     : 'They said "Break" - they are already overwhelmed, indicating a FULFILLMENT/OPERATIONS bottleneck'
 
-  const analysisPrompt = `You are the "Lead Architect," a world-class business strategist.
+  const analysisPrompt = `You are a business strategist analyzing a business owner's workflow constraints.
 
-BUSINESS OWNER RESPONSES:
+INPUTS:
+- Dread Task: "${dreadTask}"
+- Hours on this task: ${userHours}h/week
+- Capacity: ${capacityMsg}
+- Time sink: ${timeAudit}
 
-**The Dread Task:** "${dreadTask}"
-**Hours spent on this task:** ${userHours} hours/week
-
-**The Capacity Test:** ${capacityMsg}
-
-**The Time Audit:** ${timeAudit}
-
-**The Stakes:**
-- Current: ${currentRevenue} (~$${currentRevenueValue}/month)
-- Goal: ${goalRevenue} (~$${goalRevenueValue}/month)
-- Hourly value: $${hourlyValue}/hour
-
-Generate a JSON response (no markdown):
+Generate JSON (no markdown). Focus on QUALITATIVE insights only - numbers will be calculated separately.
 
 {
   "diagnosis": {
-    "rootCause": "The #1 bottleneck in 1-2 sentences",
-    "bottleneckType": "sales OR fulfillment OR operations",
-    "bottleneckCategory": "Human (people/delegation) OR Process (workflow/systems) OR Tech (tools/automation)",
-    "currentPain": "Emotional state"
+    "rootCause": "1-2 sentence description of the core bottleneck based on their ${userHours}h/week dread task",
+    "bottleneckType": "sales" OR "fulfillment" OR "operations",
+    "bottleneckCategory": "Human" OR "Process" OR "Tech",
+    "currentPain": "Brief emotional state description"
   },
   "roadmap": {
     "step1_automator": {
-      "title": "The Immediate Relief",
-      "description": "Specific automation to reclaim time (be realistic based on ${userHours}h/week they spend)",
-      "hoursRecovered": ${Math.min(Math.round(userHours * 0.6), userHours)},
-      "implementation": "First action to take"
+      "title": "Short title",
+      "description": "Specific automation for their ${timeAudit} that could recover some of their ${userHours}h",
+      "implementation": "First concrete action"
     },
     "step2_multiplier": {
-      "title": "The Growth Multiplier",
-      "description": "How to scale without manual effort",
-      "impact": "What changes (use hedged language like 'potential to' or 'up to')"
+      "title": "Short title",
+      "description": "System to handle more volume",
+      "impact": "Use hedged language: 'potential to', 'positioned for', 'up to'"
     },
     "step3_freedom": {
-      "title": "The Freedom Phase",
-      "description": "Realistic business improvement in 90 days",
-      "futureState": "Achievable vision (avoid absolute claims like 'zero hours' or exact multipliers)"
+      "title": "Short title",
+      "description": "90-day realistic outcome",
+      "futureState": "Use qualified language: 'reduced time on', 'streamlined', 'more time for'. NO absolutes like 'zero hours' or '10x'"
     }
   },
-  "roi": {
-    "currentRevenue": ${currentRevenueValue},
-    "goalRevenue": ${goalRevenueValue},
-    "hoursWastedWeekly": ${userHours},
-    "hourlyValue": ${hourlyValue},
-    "monthlyCostOfBottleneck": ${hourlyValue * userHours * 4},
-    "projectedSavings": ${Math.round(hourlyValue * userHours * 4 * 0.5)},
-    "timeToROI": "30-60 days"
-  },
   "callAgenda": [
-    "Deep-dive into your workflow",
-    "Map out the 90-day plan",
-    "Identify quick wins"
+    "Specific to their ${timeAudit}",
+    "Second agenda item",
+    "Third agenda item"
   ]
 }
 
-IMPORTANT:
-- Use the EXACT hoursWastedWeekly value of ${userHours} provided
-- hoursRecovered should not exceed ${userHours}
-- Be specific with tool recommendations but realistic with claims`
+CRITICAL: Do NOT output any numeric values - they are calculated server-side. Focus only on personalized text.`
 
   try {
     const response = await fetch(
@@ -120,27 +109,57 @@ IMPORTANT:
     let analysisText = result.candidates?.[0]?.content?.parts?.[0]?.text || ''
     analysisText = analysisText.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim()
 
+    // Server-enforced ROI values (never from LLM)
+    const enforcedRoi = {
+      currentRevenue: currentRevenueValue,
+      currentRevenueLabel: revenueLabels[currentRevenue]?.label || currentRevenue,
+      goalRevenue: goalRevenueValue,
+      goalRevenueLabel: revenueLabels[goalRevenue]?.label || goalRevenue,
+      hoursWastedWeekly: userHours,
+      hourlyValue,
+      monthlyCostOfBottleneck: monthlyCost,
+      projectedSavings,
+      timeToROI: "30-60 days"
+    }
+
+    let llmData
     try {
-      return res.json(JSON.parse(analysisText))
+      llmData = JSON.parse(analysisText)
     } catch (parseError) {
       console.error('JSON parse error:', parseError)
-      const hoursRecoverable = Math.min(Math.round(userHours * 0.6), userHours)
-      return res.json({
+      // Fallback qualitative content
+      llmData = {
         diagnosis: {
-          rootCause: `Your "${dreadTask}" is consuming ${userHours} hours/week. This is your primary constraint.`,
+          rootCause: `Your "${dreadTask}" is consuming ${userHours} hours/week - this is your primary constraint.`,
           bottleneckType: capacityTest === 'break' ? 'fulfillment' : 'sales',
           bottleneckCategory: 'Process',
-          currentPain: "Feeling overwhelmed and underwater"
+          currentPain: "Feeling stretched thin and reactive"
         },
         roadmap: {
-          step1_automator: { title: "The Immediate Relief", description: `Automate your ${timeAudit}`, hoursRecovered: hoursRecoverable, implementation: "Set up Zapier + ChatGPT" },
-          step2_multiplier: { title: "The Growth Multiplier", description: "Create systems to potentially handle more volume", impact: "Increase capacity without additional hires" },
-          step3_freedom: { title: "The Freedom Phase", description: "Streamlined business operations", futureState: `Working ON your business with up to ${hoursRecoverable} hours back weekly` }
+          step1_automator: { title: "The Immediate Relief", description: `Streamline your ${timeAudit} workflow`, implementation: "Audit current process and identify automation candidates" },
+          step2_multiplier: { title: "The Growth Multiplier", description: "Build systems for increased capacity", impact: "Positioned for more volume without proportional time increase" },
+          step3_freedom: { title: "The Freedom Phase", description: "Streamlined operations", futureState: `Reduced time on ${timeAudit}, more focus on strategic work` }
         },
-        roi: { currentRevenue: currentRevenueValue, goalRevenue: goalRevenueValue, hoursWastedWeekly: userHours, hourlyValue, monthlyCostOfBottleneck: userHours * 4 * hourlyValue, projectedSavings: Math.round(userHours * 4 * hourlyValue * 0.5), timeToROI: "30-60 days" },
-        callAgenda: [`Deep-dive into your ${timeAudit} workflow`, "Design your 90-day roadmap", "Identify quick wins"]
-      })
+        callAgenda: [`Review your ${timeAudit} workflow`, "Identify quick automation wins", "Map 90-day implementation"]
+      }
     }
+
+    // ENFORCE all numeric values - override anything LLM might have added
+    const finalResponse = {
+      diagnosis: llmData.diagnosis || {},
+      roadmap: {
+        step1_automator: {
+          ...(llmData.roadmap?.step1_automator || {}),
+          hoursRecovered: hoursRecoverable // ENFORCED
+        },
+        step2_multiplier: llmData.roadmap?.step2_multiplier || {},
+        step3_freedom: llmData.roadmap?.step3_freedom || {}
+      },
+      roi: enforcedRoi, // ENFORCED - all server-calculated
+      callAgenda: llmData.callAgenda || [`Review your ${timeAudit} workflow`, "Map 90-day plan", "Identify quick wins"]
+    }
+
+    return res.json(finalResponse)
   } catch (error) {
     console.error('Analysis error:', error)
     return res.status(500).json({ error: 'Internal server error' })

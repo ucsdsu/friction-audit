@@ -118,16 +118,16 @@ export default function Results({ data, onRestart }) {
               {/* Growth metrics */}
               <div className="space-y-3">
                 <div className="flex items-center justify-between bg-white/60 rounded-lg px-4 py-3 border border-growth-200/50">
-                  <span className="text-sm text-growth-600">Hours recovered</span>
-                  <span className="font-display text-xl font-bold text-growth-600">+{roadmap?.step1_automator?.hoursRecovered || 12}h</span>
+                  <span className="text-sm text-growth-600">Potential hours recovered</span>
+                  <span className="font-display text-xl font-bold text-growth-600">Up to {roadmap?.step1_automator?.hoursRecovered || 3}h</span>
                 </div>
                 <div className="flex items-center justify-between bg-white/60 rounded-lg px-4 py-3 border border-growth-200/50">
-                  <span className="text-sm text-growth-600">Monthly savings</span>
-                  <span className="font-display text-xl font-bold text-growth-600">${(roi?.projectedSavings || 6750).toLocaleString()}</span>
+                  <span className="text-sm text-growth-600">Potential monthly savings</span>
+                  <span className="font-display text-xl font-bold text-growth-600">${(roi?.projectedSavings || 0).toLocaleString()}</span>
                 </div>
                 <div className="flex items-center justify-between bg-white/60 rounded-lg px-4 py-3 border border-growth-200/50">
-                  <span className="text-sm text-growth-600">Revenue trajectory</span>
-                  <span className="font-display text-xl font-bold text-growth-600">${(roi?.goalRevenue || 25000).toLocaleString()}/mo</span>
+                  <span className="text-sm text-growth-600">Revenue goal</span>
+                  <span className="font-display text-xl font-bold text-growth-600">{roi?.goalRevenueLabel || '$50k+'}</span>
                 </div>
               </div>
             </div>
@@ -168,8 +168,9 @@ export default function Results({ data, onRestart }) {
                   <p className="text-navy-600 mb-4 leading-relaxed">{roadmap?.step1_automator?.description}</p>
                   <div className="grid sm:grid-cols-2 gap-3">
                     <div className="bg-growth-50 border border-growth-100 rounded-xl px-4 py-3">
-                      <p className="text-xs text-growth-600 font-medium mb-1">Hours Recovered/Week</p>
-                      <p className="font-display text-2xl font-bold text-growth-700">{roadmap?.step1_automator?.hoursRecovered || 8}+</p>
+                      <p className="text-xs text-growth-600 font-medium mb-1">Potential Hours Recovered</p>
+                      <p className="font-display text-2xl font-bold text-growth-700">Up to {roadmap?.step1_automator?.hoursRecovered || 3}h</p>
+                      <p className="text-xs text-growth-500 mt-1">of your reported {roi?.hoursWastedWeekly}h/week</p>
                     </div>
                     <div className="bg-cream-100 border border-navy-100 rounded-xl px-4 py-3">
                       <p className="text-xs text-navy-500 font-medium mb-1">First Action</p>
@@ -294,9 +295,10 @@ export default function Results({ data, onRestart }) {
             <div className="mt-4 text-xs text-navy-400 space-y-1">
               <p className="font-medium text-navy-300">How we calculated these numbers:</p>
               <ul className="list-disc list-inside space-y-0.5 text-navy-400">
-                <li>Hourly value = Your monthly revenue / 160 work hours</li>
-                <li>Monthly cost = Hours you reported ({roi?.hoursWastedWeekly}h) x 4 weeks x hourly value</li>
-                <li>Potential savings = Monthly cost x 50% (conservative estimate)</li>
+                <li>Using bracket midpoint: {roi?.currentRevenueLabel || 'your range'} → ${(roi?.currentRevenue || 0).toLocaleString()}/mo estimate</li>
+                <li>Hourly value = ${(roi?.currentRevenue || 0).toLocaleString()} / 160 hours = ${roi?.hourlyValue || 0}/hr</li>
+                <li>Monthly cost = {roi?.hoursWastedWeekly}h/week x 4 weeks x ${roi?.hourlyValue}/hr = ${(roi?.monthlyCostOfBottleneck || 0).toLocaleString()}</li>
+                <li>Potential savings = ${(roi?.monthlyCostOfBottleneck || 0).toLocaleString()} x 50% = ${(roi?.projectedSavings || 0).toLocaleString()} (conservative)</li>
               </ul>
             </div>
           </div>
