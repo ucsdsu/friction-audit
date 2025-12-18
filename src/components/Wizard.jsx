@@ -78,7 +78,9 @@ export default function Wizard({ onComplete, onStartAnalyzing }) {
           {step === 1 && (
             <DreadTask
               value={data.dreadTask}
+              hoursPerWeek={data.hoursPerWeek}
               onChange={(val) => setField('dreadTask', val)}
+              onHoursChange={(val) => setField('hoursPerWeek', val)}
               onNext={nextStep}
               canProceed={canProceed(1)}
             />

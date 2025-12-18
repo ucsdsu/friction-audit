@@ -6,37 +6,41 @@ export async function getAnalysis(wizardData) {
   if (USE_MOCK) {
     // Simulate network delay
     await new Promise(resolve => setTimeout(resolve, 2500))
+    const userHours = parseInt(wizardData.hoursPerWeek) || 5
+    const hoursRecoverable = Math.min(Math.round(userHours * 0.6), userHours)
+    const hourlyValue = Math.round(getRevenueValue(wizardData.currentRevenue) / 160)
     return {
       diagnosis: {
-        rootCause: "You're the bottleneck in your own business - spending 15+ hours weekly on tasks that should be automated, leaving no time for strategic growth.",
+        rootCause: `Your "${wizardData.dreadTask}" is consuming ${userHours} hours/week - this is your primary constraint.`,
         bottleneckType: wizardData.capacityTest === 'break' ? 'fulfillment' : 'sales',
+        bottleneckCategory: 'Process',
         currentPain: "Feeling underwater and overwhelmed, constantly putting out fires instead of building systems"
       },
       roadmap: {
         step1_automator: {
           title: "The Immediate Relief",
-          description: `Automate your ${wizardData.timeAudit || 'most time-consuming tasks'} using AI-powered workflows. This is the 20% that's causing 80% of your stress.`,
-          hoursRecovered: 12,
+          description: `Automate your ${wizardData.timeAudit || 'most time-consuming tasks'} using AI-powered workflows.`,
+          hoursRecovered: hoursRecoverable,
           implementation: "Set up Zapier + ChatGPT to handle routine communications and admin tasks"
         },
         step2_multiplier: {
           title: "The Growth Multiplier",
-          description: "Build systems that let you handle 3x the clients without 3x the work. Create SOPs, templates, and automated follow-ups.",
-          impact: "Double your capacity without hiring, finally able to take on new clients without breaking"
+          description: "Build systems that can help you handle more clients without proportionally more work.",
+          impact: "Potential to increase capacity without hiring"
         },
         step3_freedom: {
           title: "The Freedom Phase",
-          description: "In 90 days, you'll have a business that runs smoothly with 4 hours of daily input instead of 10.",
-          futureState: "Working ON your business, not IN it - with predictable revenue and 15+ hours back each week for growth or life"
+          description: "Streamlined operations with significantly reduced manual work.",
+          futureState: `Working ON your business with up to ${hoursRecoverable} hours back each week`
         }
       },
       roi: {
         currentRevenue: getRevenueValue(wizardData.currentRevenue),
         goalRevenue: getRevenueValue(wizardData.goalRevenue),
-        hoursWastedWeekly: 15,
-        hourlyValue: Math.round(getRevenueValue(wizardData.currentRevenue) / 160),
-        monthlyCostOfBottleneck: Math.round(getRevenueValue(wizardData.currentRevenue) * 0.3),
-        projectedSavings: Math.round(getRevenueValue(wizardData.currentRevenue) * 0.25),
+        hoursWastedWeekly: userHours,
+        hourlyValue: hourlyValue,
+        monthlyCostOfBottleneck: userHours * 4 * hourlyValue,
+        projectedSavings: Math.round(userHours * 4 * hourlyValue * 0.5),
         timeToROI: "30-60 days"
       },
       callAgenda: [

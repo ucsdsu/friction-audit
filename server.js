@@ -10,12 +10,14 @@ app.use(express.json())
 app.use(express.static(path.join(__dirname, 'dist')))
 
 app.post('/api/analyze', async (req, res) => {
-  const { dreadTask, capacityTest, timeAudit, currentRevenue, goalRevenue } = req.body
+  const { dreadTask, hoursPerWeek, capacityTest, timeAudit, currentRevenue, goalRevenue } = req.body
   const apiKey = process.env.GEMINI_API_KEY
 
-  if (!dreadTask || !capacityTest || !timeAudit || !currentRevenue || !goalRevenue) {
+  if (!dreadTask || !hoursPerWeek || !capacityTest || !timeAudit || !currentRevenue || !goalRevenue) {
     return res.status(400).json({ error: 'All wizard fields are required' })
   }
+
+  const userHours = parseInt(hoursPerWeek) || 5
 
   if (!apiKey) {
     return res.status(500).json({ error: 'GEMINI_API_KEY not set' })
@@ -37,6 +39,7 @@ app.post('/api/analyze', async (req, res) => {
 BUSINESS OWNER RESPONSES:
 
 **The Dread Task:** "${dreadTask}"
+**Hours spent on this task:** ${userHours} hours/week
 
 **The Capacity Test:** ${capacityMsg}
 
@@ -53,33 +56,34 @@ Generate a JSON response (no markdown):
   "diagnosis": {
     "rootCause": "The #1 bottleneck in 1-2 sentences",
     "bottleneckType": "sales OR fulfillment OR operations",
+    "bottleneckCategory": "Human (people/delegation) OR Process (workflow/systems) OR Tech (tools/automation)",
     "currentPain": "Emotional state"
   },
   "roadmap": {
     "step1_automator": {
       "title": "The Immediate Relief",
-      "description": "Specific automation to reclaim 5-10 hours/week",
-      "hoursRecovered": 8,
+      "description": "Specific automation to reclaim time (be realistic based on ${userHours}h/week they spend)",
+      "hoursRecovered": ${Math.min(Math.round(userHours * 0.6), userHours)},
       "implementation": "First action to take"
     },
     "step2_multiplier": {
       "title": "The Growth Multiplier",
       "description": "How to scale without manual effort",
-      "impact": "What changes"
+      "impact": "What changes (use hedged language like 'potential to' or 'up to')"
     },
     "step3_freedom": {
       "title": "The Freedom Phase",
-      "description": "Business in 90 days",
-      "futureState": "Vision of transformed business"
+      "description": "Realistic business improvement in 90 days",
+      "futureState": "Achievable vision (avoid absolute claims like 'zero hours' or exact multipliers)"
     }
   },
   "roi": {
     "currentRevenue": ${currentRevenueValue},
     "goalRevenue": ${goalRevenueValue},
-    "hoursWastedWeekly": 15,
+    "hoursWastedWeekly": ${userHours},
     "hourlyValue": ${hourlyValue},
-    "monthlyCostOfBottleneck": ${hourlyValue * 60},
-    "projectedSavings": ${Math.round(hourlyValue * 45)},
+    "monthlyCostOfBottleneck": ${hourlyValue * userHours * 4},
+    "projectedSavings": ${Math.round(hourlyValue * userHours * 4 * 0.5)},
     "timeToROI": "30-60 days"
   },
   "callAgenda": [
@@ -89,7 +93,10 @@ Generate a JSON response (no markdown):
   ]
 }
 
-Use values provided. Be specific with tool recommendations.`
+IMPORTANT:
+- Use the EXACT hoursWastedWeekly value of ${userHours} provided
+- hoursRecovered should not exceed ${userHours}
+- Be specific with tool recommendations but realistic with claims`
 
   try {
     const response = await fetch(
@@ -117,19 +124,20 @@ Use values provided. Be specific with tool recommendations.`
       return res.json(JSON.parse(analysisText))
     } catch (parseError) {
       console.error('JSON parse error:', parseError)
-      const hoursWasted = 15
+      const hoursRecoverable = Math.min(Math.round(userHours * 0.6), userHours)
       return res.json({
         diagnosis: {
-          rootCause: `Your "${dreadTask}" is consuming valuable hours. This is your primary constraint.`,
+          rootCause: `Your "${dreadTask}" is consuming ${userHours} hours/week. This is your primary constraint.`,
           bottleneckType: capacityTest === 'break' ? 'fulfillment' : 'sales',
+          bottleneckCategory: 'Process',
           currentPain: "Feeling overwhelmed and underwater"
         },
         roadmap: {
-          step1_automator: { title: "The Immediate Relief", description: `Automate your ${timeAudit}`, hoursRecovered: 12, implementation: "Set up Zapier + ChatGPT" },
-          step2_multiplier: { title: "The Growth Multiplier", description: "Create systems to handle 3x volume", impact: "Double capacity without hiring" },
-          step3_freedom: { title: "The Freedom Phase", description: "Business runs with 4 hours daily input", futureState: "Working ON your business with 15+ hours back" }
+          step1_automator: { title: "The Immediate Relief", description: `Automate your ${timeAudit}`, hoursRecovered: hoursRecoverable, implementation: "Set up Zapier + ChatGPT" },
+          step2_multiplier: { title: "The Growth Multiplier", description: "Create systems to potentially handle more volume", impact: "Increase capacity without additional hires" },
+          step3_freedom: { title: "The Freedom Phase", description: "Streamlined business operations", futureState: `Working ON your business with up to ${hoursRecoverable} hours back weekly` }
         },
-        roi: { currentRevenue: currentRevenueValue, goalRevenue: goalRevenueValue, hoursWastedWeekly: hoursWasted, hourlyValue, monthlyCostOfBottleneck: hoursWasted * 4 * hourlyValue, projectedSavings: Math.round(hoursWasted * 4 * hourlyValue * 0.75), timeToROI: "30-60 days" },
+        roi: { currentRevenue: currentRevenueValue, goalRevenue: goalRevenueValue, hoursWastedWeekly: userHours, hourlyValue, monthlyCostOfBottleneck: userHours * 4 * hourlyValue, projectedSavings: Math.round(userHours * 4 * hourlyValue * 0.5), timeToROI: "30-60 days" },
         callAgenda: [`Deep-dive into your ${timeAudit} workflow`, "Design your 90-day roadmap", "Identify quick wins"]
       })
     }

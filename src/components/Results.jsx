@@ -64,7 +64,12 @@ export default function Results({ data, onRestart }) {
                 </div>
                 <div>
                   <p className="text-friction-600 text-xs font-semibold uppercase tracking-wide">The Bottleneck</p>
-                  <p className="font-display text-lg font-semibold text-friction-700">{diagnosis?.bottleneckType} Constraint</p>
+                  <p className="font-display text-lg font-semibold text-friction-700 capitalize">{diagnosis?.bottleneckType} Constraint</p>
+                  {diagnosis?.bottleneckCategory && (
+                    <p className="text-friction-500 text-xs font-medium mt-0.5">
+                      Type: {diagnosis.bottleneckCategory}
+                    </p>
+                  )}
                 </div>
               </div>
 
@@ -283,6 +288,16 @@ export default function Results({ data, onRestart }) {
                   <span className="font-semibold">ROI in {roi?.timeToROI || "30-60 days"}</span>
                 </div>
               </div>
+            </div>
+
+            {/* Calculation methodology */}
+            <div className="mt-4 text-xs text-navy-400 space-y-1">
+              <p className="font-medium text-navy-300">How we calculated these numbers:</p>
+              <ul className="list-disc list-inside space-y-0.5 text-navy-400">
+                <li>Hourly value = Your monthly revenue / 160 work hours</li>
+                <li>Monthly cost = Hours you reported ({roi?.hoursWastedWeekly}h) x 4 weeks x hourly value</li>
+                <li>Potential savings = Monthly cost x 50% (conservative estimate)</li>
+              </ul>
             </div>
           </div>
         </div>

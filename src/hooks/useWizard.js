@@ -3,6 +3,7 @@ import { getAnalysis } from '../lib/api'
 
 const INITIAL_DATA = {
   dreadTask: '',
+  hoursPerWeek: '',
   capacityTest: '', // 'grow' or 'break'
   timeAudit: '',
   currentRevenue: '',
@@ -55,7 +56,8 @@ export function useWizard() {
   const canProceed = useCallback((currentStep) => {
     switch (currentStep) {
       case 1:
-        return data.dreadTask.trim().length >= 10
+        const hours = parseInt(data.hoursPerWeek)
+        return data.dreadTask.trim().length >= 10 && hours >= 1 && hours <= 40
       case 2:
         return data.capacityTest === 'grow' || data.capacityTest === 'break'
       case 3:
