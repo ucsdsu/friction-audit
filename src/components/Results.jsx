@@ -274,11 +274,11 @@ export default function Results({ data, onRestart }) {
                 <div>
                   <p className="text-growth-300 text-sm font-medium mb-1">Revenue Trajectory</p>
                   <p className="text-white">
-                    <span className="font-display text-3xl font-bold">${(roi?.currentRevenue || 10000).toLocaleString()}</span>
+                    <span className="font-display text-3xl font-bold">{roi?.currentRevenueLabel || '$10k-$25k'}</span>
                     <svg className="w-6 h-6 inline mx-3 text-growth-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
                     </svg>
-                    <span className="font-display text-3xl font-bold text-growth-400">${(roi?.goalRevenue || 25000).toLocaleString()}</span>
+                    <span className="font-display text-3xl font-bold text-growth-400">{roi?.goalRevenueLabel || '$50k+'}</span>
                     <span className="text-navy-300 text-sm ml-2">/month</span>
                   </p>
                 </div>
