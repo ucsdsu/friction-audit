@@ -100,8 +100,8 @@ export default function Landing({ onStart }) {
           <div className="mt-20 pt-12 border-t border-navy-100 animate-fade-in stagger-4" style={{ opacity: 0 }}>
             <div className="grid grid-cols-3 gap-8 max-w-2xl">
               <div>
-                <p className="font-display text-3xl font-semibold text-navy-900">2 min</p>
-                <p className="text-sm text-navy-500 mt-1">To complete</p>
+                <p className="font-display text-3xl font-semibold text-navy-900">4</p>
+                <p className="text-sm text-navy-500 mt-1">Quick questions</p>
               </div>
               <div>
                 <p className="font-display text-3xl font-semibold text-navy-900">3</p>
@@ -112,7 +112,7 @@ export default function Landing({ onStart }) {
                 <p className="text-sm text-navy-500 mt-1">Actionable roadmap</p>
               </div>
             </div>
-            <p className="text-xs text-navy-400 mt-4">Results vary based on your inputs and business context.</p>
+            <p className="text-xs text-navy-400 mt-8">Results vary based on your inputs and business context.</p>
           </div>
         </div>
       </main>
