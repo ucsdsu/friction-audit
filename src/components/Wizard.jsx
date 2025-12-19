@@ -1,8 +1,8 @@
 import { useWizard } from '../hooks/useWizard'
-import DreadTask from './steps/DreadTask'
-import CapacityTest from './steps/CapacityTest'
-import TimeAudit from './steps/TimeAudit'
 import Stakes from './steps/Stakes'
+import Constraint from './steps/CapacityTest'
+import HiringTrap from './steps/HiringTrap'
+import BleedingNeck from './steps/DreadTask'
 
 export default function Wizard({ onComplete, onStartAnalyzing }) {
   const {
@@ -19,7 +19,7 @@ export default function Wizard({ onComplete, onStartAnalyzing }) {
     onStartAnalyzing()
     try {
       const analysis = await submitForAnalysis()
-      onComplete(analysis)
+      onComplete(analysis, data)
     } catch (err) {
       console.error('Analysis failed:', err)
     }
@@ -39,8 +39,8 @@ export default function Wizard({ onComplete, onStartAnalyzing }) {
               </svg>
             </div>
             <div>
-              <h1 className="font-display font-semibold text-navy-900">Friction Audit</h1>
-              <p className="text-xs text-navy-500">Strategic Diagnostic</p>
+              <h1 className="font-display font-semibold text-navy-900">AI Feasibility Scope</h1>
+              <p className="text-xs text-navy-500">Operational Assessment</p>
             </div>
           </div>
 
@@ -75,42 +75,41 @@ export default function Wizard({ onComplete, onStartAnalyzing }) {
       {/* Content */}
       <main className="flex-1 flex items-center justify-center px-4 py-8 md:py-12">
         <div className="w-full max-w-xl">
+          {/* Step 1: The Scale (Revenue) */}
           {step === 1 && (
-            <DreadTask
-              value={data.dreadTask}
-              hoursPerWeek={data.hoursPerWeek}
-              onChange={(val) => setField('dreadTask', val)}
-              onHoursChange={(val) => setField('hoursPerWeek', val)}
+            <Stakes
+              currentRevenue={data.currentRevenue}
+              onChangeCurrentRevenue={(val) => setField('currentRevenue', val)}
               onNext={nextStep}
               canProceed={canProceed(1)}
             />
           )}
 
+          {/* Step 2: The Constraint */}
           {step === 2 && (
-            <CapacityTest
-              value={data.capacityTest}
-              onChange={(val) => setField('capacityTest', val)}
+            <Constraint
+              value={data.constraint}
+              onChange={(val) => setField('constraint', val)}
               onNext={nextStep}
               onBack={prevStep}
             />
           )}
 
+          {/* Step 3: The Hiring Trap */}
           {step === 3 && (
-            <TimeAudit
-              value={data.timeAudit}
-              onChange={(val) => setField('timeAudit', val)}
+            <HiringTrap
+              value={data.hiringTrap}
+              onChange={(val) => setField('hiringTrap', val)}
               onNext={nextStep}
               onBack={prevStep}
-              canProceed={canProceed(3)}
             />
           )}
 
+          {/* Step 4: The Bleeding Neck */}
           {step === 4 && (
-            <Stakes
-              currentRevenue={data.currentRevenue}
-              goalRevenue={data.goalRevenue}
-              onChangeCurrentRevenue={(val) => setField('currentRevenue', val)}
-              onChangeGoalRevenue={(val) => setField('goalRevenue', val)}
+            <BleedingNeck
+              value={data.bleedingNeck}
+              onChange={(val) => setField('bleedingNeck', val)}
               onSubmit={handleFinalSubmit}
               onBack={prevStep}
               canProceed={canProceed(4)}
@@ -147,28 +146,26 @@ function ProcessingScreen() {
         </div>
 
         <h3 className="font-display text-xl font-semibold text-navy-900 mb-2">
-          Analyzing Your Operations
+          Analyzing Operational Throughput
         </h3>
         <p className="text-navy-500 text-sm mb-6">
-          Applying Theory of Constraints analysis...
+          Generating your implementation roadmap...
         </p>
 
         {/* Progress steps */}
-        <div className="space-y-2 text-left max-w-xs mx-auto">
+        <div className="space-y-2 text-left max-w-xs mx-auto font-mono text-sm">
           {[
-            'Identifying friction points',
-            'Calculating time costs',
-            'Building automation roadmap',
+            '> Analyzing Operational Throughput...',
+            '> Calculating "Headcount Savings" vs. Automation...',
+            '> Matching Bottleneck to Agentic Models...',
+            '> Generating Implementation Roadmap...',
           ].map((step, i) => (
             <div
               key={i}
-              className="flex items-center gap-3 text-sm animate-fade-in"
-              style={{ animationDelay: `${i * 0.5}s`, opacity: 0 }}
+              className="flex items-center gap-3 animate-fade-in text-navy-600"
+              style={{ animationDelay: `${i * 0.6}s`, opacity: 0 }}
             >
-              <div className="w-4 h-4 rounded-full bg-growth-100 flex items-center justify-center">
-                <div className="w-1.5 h-1.5 rounded-full bg-growth-500 animate-pulse-subtle" />
-              </div>
-              <span className="text-navy-600">{step}</span>
+              <span>{step}</span>
             </div>
           ))}
         </div>

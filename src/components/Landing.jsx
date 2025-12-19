@@ -17,12 +17,12 @@ export default function Landing({ onStart }) {
                 <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
             </div>
-            <span className="font-display font-semibold text-xl text-navy-900">Friction Audit</span>
+            <span className="font-display font-semibold text-xl text-navy-900">AI Feasibility Scope</span>
           </div>
 
           <div className="hidden sm:flex items-center gap-2 text-sm text-navy-500">
             <span className="w-2 h-2 bg-growth-500 rounded-full animate-pulse-subtle" />
-            <span>Instant analysis</span>
+            <span>3-minute assessment</span>
           </div>
         </div>
       </header>
@@ -34,18 +34,18 @@ export default function Landing({ onStart }) {
           <div className="mb-8 animate-fade-in">
             <span className="inline-flex items-center gap-2 text-sm font-medium text-navy-600 tracking-wide uppercase">
               <span className="w-8 h-px bg-navy-300" />
-              For Growing Businesses
+              External AI Architects
             </span>
           </div>
 
           {/* Headline */}
           <h1 className="font-display text-display-lg md:text-display-xl text-navy-900 mb-8 animate-slide-up">
-            Scale Your Revenue, <span className="underline-accent">Not Your Headcount.</span>
+            Grow Your Revenue, <span className="underline-accent">Not Your Headcount.</span>
           </h1>
 
           {/* Subheadline */}
           <p className="text-xl md:text-2xl text-navy-600 leading-relaxed max-w-3xl mb-12 animate-slide-up stagger-1" style={{ opacity: 0 }}>
-            You can't grow if you're the one doing all the work. We analyze your workflow to find exactly where <span className="font-semibold text-navy-800">AI tools can replace expensive manual labor</span>—giving you an operating system that runs without you.
+            You are hitting a ceiling because your operations rely on human speed. We identify the manual workflows capping your growth and replace them with <span className="font-semibold text-navy-800">AI Agents</span> that work 24/7—so you can scale to $10M without bloating your payroll.
           </p>
 
           {/* The 3-step bridge */}
@@ -53,18 +53,18 @@ export default function Landing({ onStart }) {
             {[
               {
                 step: '01',
-                title: 'Identify',
-                desc: 'Find the specific "grunt work" tasks silently capping your monthly revenue.',
+                title: 'Scope',
+                desc: 'Identify the specific "grunt work" (Data Entry, Outreach, Support) that is forcing you to hire more staff.',
               },
               {
                 step: '02',
-                title: 'Automate',
-                desc: 'See how AI agents can execute sales & ops tasks 24/7—for a fraction of hiring costs.',
+                title: 'Architect',
+                desc: 'Design a "Parallel Workforce" using AI Tools (Lindy, Claude) that costs a fraction of a human employee.',
               },
               {
                 step: '03',
-                title: 'Delegate',
-                desc: 'Get a custom blueprint to remove yourself from the day-to-day grind.',
+                title: 'Deploy',
+                desc: 'Receive a Fixed-Timeline Implementation Plan to automate that workflow completely in under 30 days.',
               },
             ].map((item, i) => (
               <div key={i} className="group">
@@ -84,14 +84,14 @@ export default function Landing({ onStart }) {
               onClick={onStart}
               className="btn-primary text-lg group"
             >
-              Start Your Audit
+              Initialize Feasibility Scope
               <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
               </svg>
             </button>
 
             <p className="mt-4 text-sm text-navy-400">
-              Free • 2 minutes • Instant analysis
+              Free • 3 Minutes • No "Consultant Fluff"
             </p>
           </div>
 
@@ -104,14 +104,14 @@ export default function Landing({ onStart }) {
               </div>
               <div>
                 <p className="font-display text-3xl font-semibold text-navy-900">1</p>
-                <p className="text-sm text-navy-500 mt-1">Growth blocker found</p>
+                <p className="text-sm text-navy-500 mt-1">Bottleneck identified</p>
               </div>
               <div>
                 <p className="font-display text-3xl font-semibold text-navy-900">30-day</p>
-                <p className="text-sm text-navy-500 mt-1">Automation roadmap</p>
+                <p className="text-sm text-navy-500 mt-1">Implementation plan</p>
               </div>
             </div>
-            <p className="text-xs text-navy-400 mt-8">Results tailored to your current team size and revenue.</p>
+            <p className="text-xs text-navy-400 mt-8">Results tailored to your revenue level and specific workflow.</p>
           </div>
         </div>
       </main>

@@ -14,10 +14,10 @@ export default function BookingCTA({ callAgenda, topRecommendation }) {
             <span className="text-growth-400 text-xs font-medium tracking-wide uppercase">Next Step</span>
           </div>
           <h3 className="font-display text-2xl font-semibold text-cream-50 mb-1">
-            Ready to Reclaim Your Time?
+            Engineering Brief
           </h3>
           <p className="text-navy-300 text-sm">
-            Book a complimentary 15-minute strategy session
+            This scope is a simulation. To confirm we can build this for your specific business context, let's review your tech stack.
           </p>
         </div>
       </div>
@@ -25,36 +25,40 @@ export default function BookingCTA({ callAgenda, topRecommendation }) {
       {/* Content */}
       <div className="p-6 bg-white">
         {/* Top recommendation highlight */}
-        <div className="bg-growth-50 border border-growth-200 rounded-xl p-4 mb-6">
-          <div className="flex items-start gap-3">
-            <div className="flex-shrink-0 w-10 h-10 bg-growth-100 rounded-lg flex items-center justify-center">
-              <svg className="w-5 h-5 text-growth-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 10V3L4 14h7v7l9-11h-7z" />
-              </svg>
-            </div>
-            <div>
-              <p className="text-xs text-growth-600 font-semibold mb-1 tracking-wide uppercase">Your Quick Win</p>
-              <p className="text-sm text-growth-800 leading-relaxed">{topRecommendation}</p>
+        {topRecommendation && (
+          <div className="bg-growth-50 border border-growth-200 rounded-xl p-4 mb-6">
+            <div className="flex items-start gap-3">
+              <div className="flex-shrink-0 w-10 h-10 bg-growth-100 rounded-lg flex items-center justify-center">
+                <svg className="w-5 h-5 text-growth-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+              </div>
+              <div>
+                <p className="text-xs text-growth-600 font-semibold mb-1 tracking-wide uppercase">Your Quick Win</p>
+                <p className="text-sm text-growth-800 leading-relaxed">{topRecommendation}</p>
+              </div>
             </div>
           </div>
-        </div>
+        )}
 
         {/* What we'll discuss */}
-        <div className="mb-6">
-          <h4 className="font-display text-sm font-semibold text-navy-900 mb-4">What we'll cover:</h4>
-          <ul className="space-y-3">
-            {callAgenda?.map((item, index) => (
-              <li key={index} className="flex items-start gap-3 text-sm text-navy-600">
-                <div className="flex-shrink-0 w-5 h-5 bg-growth-100 rounded-full flex items-center justify-center mt-0.5">
-                  <svg className="w-3 h-3 text-growth-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
-                  </svg>
-                </div>
-                <span className="leading-relaxed">{item}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
+        {callAgenda && callAgenda.length > 0 && (
+          <div className="mb-6">
+            <h4 className="font-display text-sm font-semibold text-navy-900 mb-4">What we'll cover:</h4>
+            <ul className="space-y-3">
+              {callAgenda.map((item, index) => (
+                <li key={index} className="flex items-start gap-3 text-sm text-navy-600">
+                  <div className="flex-shrink-0 w-5 h-5 bg-growth-100 rounded-full flex items-center justify-center mt-0.5">
+                    <svg className="w-3 h-3 text-growth-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                    </svg>
+                  </div>
+                  <span className="leading-relaxed">{item}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
 
         {/* CTA Button */}
         <a
@@ -63,14 +67,18 @@ export default function BookingCTA({ callAgenda, topRecommendation }) {
           rel="noopener noreferrer"
           className="btn-primary w-full text-center text-base"
         >
-          Book Your Strategy Call
+          Book Implementation Brief
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
           </svg>
         </a>
 
         {/* Trust elements */}
-        <div className="mt-5 flex items-center justify-center gap-5 text-xs text-navy-400">
+        <p className="mt-4 text-center text-xs text-navy-400">
+          Speak directly with the Architect. No sales pressure.
+        </p>
+
+        <div className="mt-4 flex items-center justify-center gap-5 text-xs text-navy-400">
           <span className="flex items-center gap-1.5">
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />

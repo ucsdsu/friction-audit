@@ -2,58 +2,59 @@
 const USE_MOCK = import.meta.env.VITE_USE_MOCK === 'true'
 const API_BASE = '/api'
 
+// Constraint labels for personalization
+const CONSTRAINT_LABELS = {
+  sales: 'Sales',
+  operations: 'Operations',
+  admin: 'Admin',
+  support: 'Support',
+}
+
+// Hiring trap labels
+const HIRING_TRAP_LABELS = {
+  salary: "can't justify a full-time salary yet",
+  messy: "the process is too messy to train someone",
+  failed: "tried hiring but they couldn't do it right",
+  intuition: 'it requires "Founder Intuition"',
+}
+
 export async function getAnalysis(wizardData) {
   if (USE_MOCK) {
     // Simulate network delay
     await new Promise(resolve => setTimeout(resolve, 2500))
-    const userHours = parseInt(wizardData.hoursPerWeek) || 5
-    const hoursRecoverable = Math.min(Math.round(userHours * 0.7), userHours) // max 70%
-    const currentRevenueValue = getRevenueValue(wizardData.currentRevenue)
-    const goalRevenueValue = getRevenueValue(wizardData.goalRevenue)
-    const hourlyValue = Math.round(currentRevenueValue / 160)
-    const monthlyCost = userHours * 4 * hourlyValue
-    const projectedSavings = Math.round(monthlyCost * 0.5) // conservative 50%
+
+    const constraintLabel = CONSTRAINT_LABELS[wizardData.constraint] || 'operational'
+    const hiringLabel = HIRING_TRAP_LABELS[wizardData.hiringTrap] || 'a hiring challenge'
+    const revenueLabel = getRevenueLabel(wizardData.currentRevenue)
 
     return {
       diagnosis: {
-        rootCause: `Your "${wizardData.dreadTask}" is consuming ${userHours} hours/week - this is your primary constraint.`,
-        bottleneckType: wizardData.capacityTest === 'break' ? 'fulfillment' : 'sales',
+        rootCause: `Your ${constraintLabel.toLowerCase()} workflow around "${wizardData.bleedingNeck}" is consuming significant hours—and you haven't delegated it because ${hiringLabel}.`,
+        bottleneckType: wizardData.constraint,
         bottleneckCategory: 'Process',
         currentPain: "Feeling stretched thin, reactive instead of strategic"
       },
       roadmap: {
         step1_automator: {
           title: "The Immediate Relief",
-          description: `Streamline your ${wizardData.timeAudit || 'workflow'} to recover some of the ${userHours}h you're currently spending.`,
-          hoursRecovered: hoursRecoverable,
-          implementation: "Audit current process and identify automation candidates"
+          description: `Deploy an AI agent to handle repetitive ${constraintLabel.toLowerCase()} tasks, specifically: ${wizardData.bleedingNeck}`,
+          implementation: "Map current workflow and identify automation candidates"
         },
         step2_multiplier: {
           title: "The Growth Multiplier",
-          description: "Build systems that position you for increased capacity.",
-          impact: "Potential to handle more volume without proportional time increase"
+          description: "Build a custom logic layer to sync data with your existing systems.",
+          impact: "Positioned for more volume without proportional headcount increase"
         },
         step3_freedom: {
           title: "The Freedom Phase",
-          description: "Streamlined operations with reduced manual overhead.",
-          futureState: `Reduced time on ${wizardData.timeAudit || 'admin tasks'}, more focus on strategic growth`
+          description: "Fully automated workflow running 24/7 without manual intervention.",
+          futureState: `No more manual ${constraintLabel.toLowerCase()} tasks—your AI agent handles it all`
         }
       },
-      roi: {
-        currentRevenue: currentRevenueValue,
-        currentRevenueLabel: getRevenueLabel(wizardData.currentRevenue),
-        goalRevenue: goalRevenueValue,
-        goalRevenueLabel: getRevenueLabel(wizardData.goalRevenue),
-        hoursWastedWeekly: userHours,
-        hourlyValue: hourlyValue,
-        monthlyCostOfBottleneck: monthlyCost,
-        projectedSavings: projectedSavings,
-        timeToROI: "30-60 days"
-      },
       callAgenda: [
-        `Review your ${wizardData.timeAudit || 'workflow'} and map automation opportunities`,
-        "Identify quick wins for immediate implementation",
-        "Outline 30-day roadmap priorities"
+        `Review your ${constraintLabel.toLowerCase()} workflow and current tech stack`,
+        "Identify specific automation opportunities for your bottleneck",
+        "Outline the 30-day implementation sprint timeline"
       ]
     }
   }
@@ -73,26 +74,13 @@ export async function getAnalysis(wizardData) {
   return response.json()
 }
 
-// Helper to convert revenue range to midpoint value
-function getRevenueValue(range) {
-  const values = {
-    'under-5k': 3000,
-    '5k-10k': 7500,
-    '10k-25k': 17500,
-    '25k-50k': 37500,
-    '50k-plus': 75000
-  }
-  return values[range] || 10000
-}
-
 // Helper to get human-readable revenue label
 function getRevenueLabel(range) {
   const labels = {
-    'under-5k': 'Under $5k',
-    '5k-10k': '$5k-$10k',
-    '10k-25k': '$10k-$25k',
-    '25k-50k': '$25k-$50k',
-    '50k-plus': '$50k+'
+    'under-500k': 'Under $500k',
+    '1m-3m': '$1M – $3M',
+    '3m-10m': '$3M – $10M',
+    '10m-plus': '$10M+'
   }
   return labels[range] || range
 }

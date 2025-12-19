@@ -9,83 +9,88 @@ const PORT = process.env.PORT || 3000
 app.use(express.json())
 app.use(express.static(path.join(__dirname, 'dist')))
 
+// Constraint labels
+const CONSTRAINT_LABELS = {
+  sales: 'Sales',
+  operations: 'Operations',
+  admin: 'Admin',
+  support: 'Support',
+}
+
+// Hiring trap labels
+const HIRING_TRAP_LABELS = {
+  salary: "can't justify a full-time salary yet",
+  messy: "the process is too messy to train someone",
+  failed: "tried hiring but they couldn't do it right",
+  intuition: 'it requires "Founder Intuition"',
+}
+
+// Revenue labels (annual)
+const REVENUE_LABELS = {
+  'under-500k': { label: 'Under $500k' },
+  '1m-3m': { label: '$1M – $3M' },
+  '3m-10m': { label: '$3M – $10M' },
+  '10m-plus': { label: '$10M+' }
+}
+
 app.post('/api/analyze', async (req, res) => {
-  const { dreadTask, hoursPerWeek, capacityTest, timeAudit, currentRevenue, goalRevenue } = req.body
+  const { currentRevenue, constraint, hiringTrap, bleedingNeck } = req.body
   const apiKey = process.env.GEMINI_API_KEY
 
-  if (!dreadTask || !hoursPerWeek || !capacityTest || !timeAudit || !currentRevenue || !goalRevenue) {
+  if (!currentRevenue || !constraint || !hiringTrap || !bleedingNeck) {
     return res.status(400).json({ error: 'All wizard fields are required' })
   }
-
-  const userHours = parseInt(hoursPerWeek) || 5
 
   if (!apiKey) {
     return res.status(500).json({ error: 'GEMINI_API_KEY not set' })
   }
 
-  // Revenue bracket midpoints (disclosed in UI)
-  const revenueLabels = {
-    'under-5k': { midpoint: 3000, label: 'Under $5k' },
-    '5k-10k': { midpoint: 7500, label: '$5k-$10k' },
-    '10k-25k': { midpoint: 17500, label: '$10k-$25k' },
-    '25k-50k': { midpoint: 37500, label: '$25k-$50k' },
-    '50k-plus': { midpoint: 75000, label: '$50k+' }
-  }
-  const currentRevenueValue = revenueLabels[currentRevenue]?.midpoint || 10000
-  const goalRevenueValue = revenueLabels[goalRevenue]?.midpoint || 25000
-  const hourlyValue = Math.round(currentRevenueValue / 160)
+  const constraintLabel = CONSTRAINT_LABELS[constraint] || 'operational'
+  const hiringLabel = HIRING_TRAP_LABELS[hiringTrap] || 'a hiring challenge'
+  const revenueLabel = REVENUE_LABELS[currentRevenue]?.label || currentRevenue
 
-  // Enforce hours - user's reported value only
-  const hoursRecoverable = Math.min(Math.round(userHours * 0.7), userHours) // max 70% recoverable
-  const monthlyCost = userHours * 4 * hourlyValue
-  const projectedSavings = Math.round(monthlyCost * 0.5) // conservative 50%
-
-  const capacityMsg = capacityTest === 'grow' 
-    ? 'They said "Grow" - they need MORE leads, indicating a SALES bottleneck'
-    : 'They said "Break" - they are already overwhelmed, indicating a FULFILLMENT/OPERATIONS bottleneck'
-
-  const analysisPrompt = `You are a business strategist analyzing a business owner's workflow constraints.
+  const analysisPrompt = `You are a business strategist analyzing a business owner's workflow constraints for an AI automation feasibility assessment.
 
 INPUTS:
-- Dread Task: "${dreadTask}"
-- Hours on this task: ${userHours}h/week
-- Capacity: ${capacityMsg}
-- Time sink: ${timeAudit}
+- Annual Revenue: ${revenueLabel}
+- Primary Constraint Area: ${constraintLabel} - this is where the business would break if the owner stopped working
+- Why They Haven't Hired: ${hiringLabel}
+- Specific Repetitive Task ("Bleeding Neck"): "${bleedingNeck}"
 
-Generate JSON (no markdown). Focus on QUALITATIVE insights only - numbers will be calculated separately.
+Generate JSON (no markdown). Focus on QUALITATIVE insights for deploying AI agents to replace manual labor.
 
 {
   "diagnosis": {
-    "rootCause": "1-2 sentence description of the core bottleneck based on their ${userHours}h/week dread task",
-    "bottleneckType": "sales" OR "fulfillment" OR "operations",
+    "rootCause": "1-2 sentence description tying together their constraint, hiring trap, and bleeding neck task",
+    "bottleneckType": "${constraint}",
     "bottleneckCategory": "Human" OR "Process" OR "Tech",
     "currentPain": "Brief emotional state description"
   },
   "roadmap": {
     "step1_automator": {
-      "title": "Short title",
-      "description": "Specific automation for their ${timeAudit} that could recover some of their ${userHours}h",
-      "implementation": "First concrete action"
+      "title": "Short title for the AI Agent solution",
+      "description": "Specific description of what an AI agent would do to handle their bleeding neck task: ${bleedingNeck}",
+      "implementation": "First concrete action to start the build"
     },
     "step2_multiplier": {
       "title": "Short title",
-      "description": "System to handle more volume",
+      "description": "How the AI agent integrates with their existing systems/CRM",
       "impact": "Use hedged language: 'potential to', 'positioned for', 'up to'"
     },
     "step3_freedom": {
       "title": "Short title",
-      "description": "30-day realistic outcome",
-      "futureState": "Use qualified language: 'reduced time on', 'streamlined', 'more time for'. NO absolutes like 'zero hours' or '10x'"
+      "description": "30-day outcome after the implementation sprint",
+      "futureState": "Paint the picture of ${constraintLabel.toLowerCase()} running without manual intervention"
     }
   },
   "callAgenda": [
-    "Specific to their ${timeAudit}",
-    "Second agenda item",
-    "Third agenda item"
+    "Specific agenda item about their ${constraintLabel.toLowerCase()} workflow",
+    "Review current tech stack for integration",
+    "Map the 30-day implementation timeline"
   ]
 }
 
-CRITICAL: Do NOT output any numeric values - they are calculated server-side. Focus only on personalized text.`
+CRITICAL: Focus on personalized, qualitative content. The UI will handle static claims like "20-30 hours saved."`
 
   try {
     const response = await fetch(
@@ -109,19 +114,6 @@ CRITICAL: Do NOT output any numeric values - they are calculated server-side. Fo
     let analysisText = result.candidates?.[0]?.content?.parts?.[0]?.text || ''
     analysisText = analysisText.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim()
 
-    // Server-enforced ROI values (never from LLM)
-    const enforcedRoi = {
-      currentRevenue: currentRevenueValue,
-      currentRevenueLabel: revenueLabels[currentRevenue]?.label || currentRevenue,
-      goalRevenue: goalRevenueValue,
-      goalRevenueLabel: revenueLabels[goalRevenue]?.label || goalRevenue,
-      hoursWastedWeekly: userHours,
-      hourlyValue,
-      monthlyCostOfBottleneck: monthlyCost,
-      projectedSavings,
-      timeToROI: "30-60 days"
-    }
-
     let llmData
     try {
       llmData = JSON.parse(analysisText)
@@ -130,33 +122,48 @@ CRITICAL: Do NOT output any numeric values - they are calculated server-side. Fo
       // Fallback qualitative content
       llmData = {
         diagnosis: {
-          rootCause: `Your "${dreadTask}" is consuming ${userHours} hours/week - this is your primary constraint.`,
-          bottleneckType: capacityTest === 'break' ? 'fulfillment' : 'sales',
+          rootCause: `Your ${constraintLabel.toLowerCase()} workflow around "${bleedingNeck}" is consuming significant hours—and you haven't delegated it because ${hiringLabel}.`,
+          bottleneckType: constraint,
           bottleneckCategory: 'Process',
           currentPain: "Feeling stretched thin and reactive"
         },
         roadmap: {
-          step1_automator: { title: "The Immediate Relief", description: `Streamline your ${timeAudit} workflow`, implementation: "Audit current process and identify automation candidates" },
-          step2_multiplier: { title: "The Growth Multiplier", description: "Build systems for increased capacity", impact: "Positioned for more volume without proportional time increase" },
-          step3_freedom: { title: "The Freedom Phase", description: "Streamlined operations", futureState: `Reduced time on ${timeAudit}, more focus on strategic work` }
+          step1_automator: {
+            title: "The Immediate Relief",
+            description: `Deploy an AI agent to handle: ${bleedingNeck}`,
+            implementation: "Map current workflow and identify automation candidates"
+          },
+          step2_multiplier: {
+            title: "The Growth Multiplier",
+            description: "Build a custom logic layer to sync with your existing systems",
+            impact: "Positioned for more volume without proportional headcount increase"
+          },
+          step3_freedom: {
+            title: "The Freedom Phase",
+            description: "Fully automated workflow running 24/7",
+            futureState: `No more manual ${constraintLabel.toLowerCase()} tasks—your AI agent handles it all`
+          }
         },
-        callAgenda: [`Review your ${timeAudit} workflow`, "Identify quick automation wins", "Map 30-day implementation"]
+        callAgenda: [
+          `Review your ${constraintLabel.toLowerCase()} workflow and current tech stack`,
+          "Identify specific automation opportunities",
+          "Map the 30-day implementation timeline"
+        ]
       }
     }
 
-    // ENFORCE all numeric values - override anything LLM might have added
     const finalResponse = {
       diagnosis: llmData.diagnosis || {},
       roadmap: {
-        step1_automator: {
-          ...(llmData.roadmap?.step1_automator || {}),
-          hoursRecovered: hoursRecoverable // ENFORCED
-        },
+        step1_automator: llmData.roadmap?.step1_automator || {},
         step2_multiplier: llmData.roadmap?.step2_multiplier || {},
         step3_freedom: llmData.roadmap?.step3_freedom || {}
       },
-      roi: enforcedRoi, // ENFORCED - all server-calculated
-      callAgenda: llmData.callAgenda || [`Review your ${timeAudit} workflow`, "Map 30-day plan", "Identify quick wins"]
+      callAgenda: llmData.callAgenda || [
+        `Review your ${constraintLabel.toLowerCase()} workflow`,
+        "Map 30-day implementation plan",
+        "Identify quick wins"
+      ]
     }
 
     return res.json(finalResponse)

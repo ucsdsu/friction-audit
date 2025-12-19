@@ -1,9 +1,25 @@
 import BookingCTA from './BookingCTA'
 
-export default function Results({ data, onRestart }) {
+const CONSTRAINT_LABELS = {
+  sales: 'Sales',
+  operations: 'Operations',
+  admin: 'Admin',
+  support: 'Support',
+}
+
+const REVENUE_LABELS = {
+  'under-500k': 'Under $500k',
+  '1m-3m': '$1M – $3M',
+  '3m-10m': '$3M – $10M',
+  '10m-plus': '$10M+',
+}
+
+export default function Results({ data, onRestart, wizardData }) {
   if (!data) return null
 
-  const { diagnosis, roadmap, roi, callAgenda } = data
+  const { diagnosis, roadmap, callAgenda } = data
+  const constraintLabel = CONSTRAINT_LABELS[wizardData?.constraint] || 'operational'
+  const revenueLabel = REVENUE_LABELS[wizardData?.currentRevenue] || 'your revenue level'
 
   return (
     <div className="min-h-screen bg-cream-50">
@@ -17,8 +33,8 @@ export default function Results({ data, onRestart }) {
               </svg>
             </div>
             <div>
-              <h1 className="font-display font-semibold text-navy-900">Your Transformation Roadmap</h1>
-              <p className="text-xs text-navy-500">Personalized automation strategy</p>
+              <h1 className="font-display font-semibold text-navy-900">Automation Feasibility Report</h1>
+              <p className="text-xs text-navy-500">AI Implementation Assessment</p>
             </div>
           </div>
           <button
@@ -30,292 +46,161 @@ export default function Results({ data, onRestart }) {
         </div>
       </header>
 
-      <main className="px-4 py-8 md:py-12 max-w-5xl mx-auto">
-        {/* Hero Diagnosis */}
-        <div className="text-center mb-12 animate-fade-in">
-          <span className="inline-flex items-center gap-2 text-sm font-medium text-navy-600 tracking-wide uppercase mb-4">
-            <span className="w-8 h-px bg-navy-300" />
-            Diagnosis Complete
-            <span className="w-8 h-px bg-navy-300" />
-          </span>
-          <h2 className="font-display text-display-md md:text-display-lg text-navy-900 mb-4">
-            We Found Your <span className="underline-accent">Constraint</span>
+      <main className="px-4 py-8 md:py-12 max-w-4xl mx-auto">
+        {/* Status Banner */}
+        <div className="bg-growth-500 text-white rounded-2xl p-6 mb-8 animate-fade-in">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="w-3 h-3 bg-white rounded-full animate-pulse" />
+            <span className="text-sm font-semibold uppercase tracking-wide opacity-90">Status</span>
+          </div>
+          <h2 className="font-display text-2xl md:text-3xl font-bold">
+            HIGH POTENTIAL FOR AI DEPLOYMENT
           </h2>
-          <p className="text-xl text-navy-600 max-w-2xl mx-auto">
-            {diagnosis?.rootCause}
-          </p>
         </div>
 
-        {/* Split Screen: Current State vs Future State */}
-        <div className="grid md:grid-cols-2 gap-6 mb-12 animate-slide-up">
-          {/* Current State - Left Side (Friction/Red) */}
-          <div className="relative">
-            <div className="absolute -top-3 left-4 z-10">
-              <span className="bg-friction-500 text-white text-xs font-semibold px-3 py-1 rounded-full shadow-lg">
-                CURRENT STATE
-              </span>
-            </div>
-            <div className="bg-gradient-to-br from-friction-50 to-friction-100/50 rounded-2xl border-2 border-friction-200 p-6 pt-8 h-full">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-12 h-12 bg-friction-100 rounded-xl flex items-center justify-center">
-                  <svg className="w-6 h-6 text-friction-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                  </svg>
-                </div>
-                <div>
-                  <p className="text-friction-600 text-xs font-semibold uppercase tracking-wide">The Bottleneck</p>
-                  <p className="font-display text-lg font-semibold text-friction-700 capitalize">{diagnosis?.bottleneckType} Constraint</p>
-                  {diagnosis?.bottleneckCategory && (
-                    <p className="text-friction-500 text-xs font-medium mt-0.5">
-                      Type: {diagnosis.bottleneckCategory}
-                    </p>
-                  )}
-                </div>
-              </div>
-
-              <p className="text-friction-700 mb-5 leading-relaxed">{diagnosis?.currentPain}</p>
-
-              {/* Pain metrics */}
-              <div className="space-y-3">
-                <div className="flex items-center justify-between bg-white/60 rounded-lg px-4 py-3 border border-friction-200/50">
-                  <span className="text-sm text-friction-600">Hours lost weekly</span>
-                  <span className="font-display text-xl font-bold text-friction-600">{roi?.hoursWastedWeekly || 15}h</span>
-                </div>
-                <div className="flex items-center justify-between bg-white/60 rounded-lg px-4 py-3 border border-friction-200/50">
-                  <span className="text-sm text-friction-600">Monthly cost</span>
-                  <span className="font-display text-xl font-bold text-friction-600">${(roi?.monthlyCostOfBottleneck || 9000).toLocaleString()}</span>
-                </div>
-                <div className="flex items-center justify-between bg-white/60 rounded-lg px-4 py-3 border border-friction-200/50">
-                  <span className="text-sm text-friction-600">Revenue plateau</span>
-                  <span className="font-display text-xl font-bold text-friction-600">${(roi?.currentRevenue || 10000).toLocaleString()}/mo</span>
-                </div>
-              </div>
-            </div>
+        {/* Section 1: The Diagnosis */}
+        <section className="mb-10 animate-slide-up">
+          <div className="flex items-center gap-3 mb-4">
+            <span className="bg-navy-900 text-cream-50 text-xs font-bold px-3 py-1 rounded-full">01</span>
+            <h3 className="font-display text-xl font-semibold text-navy-900">The Diagnosis</h3>
           </div>
 
-          {/* Future State - Right Side (Growth/Green) */}
-          <div className="relative">
-            <div className="absolute -top-3 left-4 z-10">
-              <span className="bg-growth-500 text-white text-xs font-semibold px-3 py-1 rounded-full shadow-lg">
-                FUTURE STATE
-              </span>
-            </div>
-            <div className="bg-gradient-to-br from-growth-50 to-growth-100/50 rounded-2xl border-2 border-growth-200 p-6 pt-8 h-full">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-12 h-12 bg-growth-100 rounded-xl flex items-center justify-center">
+          <div className="card p-6">
+            <h4 className="font-display text-lg font-semibold text-friction-600 mb-4">
+              The "Headcount Trap" Detected
+            </h4>
+            <p className="text-navy-700 leading-relaxed mb-4">
+              You are currently solving <span className="font-semibold text-navy-900">{constraintLabel}</span> problems with human labor. At your revenue level ({revenueLabel}), this creates a "margin crush."
+            </p>
+            <p className="text-navy-700 leading-relaxed">
+              You do not need more employees; you need an <span className="font-semibold text-navy-900">Operating System</span>.
+            </p>
+
+            {diagnosis?.rootCause && (
+              <div className="mt-6 p-4 bg-navy-50 rounded-xl border border-navy-100">
+                <p className="text-navy-600 text-sm leading-relaxed">{diagnosis.rootCause}</p>
+              </div>
+            )}
+          </div>
+        </section>
+
+        {/* Section 2: The Solution Architecture */}
+        <section className="mb-10 animate-slide-up" style={{ animationDelay: '100ms' }}>
+          <div className="flex items-center gap-3 mb-4">
+            <span className="bg-navy-900 text-cream-50 text-xs font-bold px-3 py-1 rounded-full">02</span>
+            <h3 className="font-display text-xl font-semibold text-navy-900">The Solution Architecture</h3>
+          </div>
+
+          <div className="card p-6">
+            <h4 className="font-display text-lg font-semibold text-navy-800 mb-6">
+              Recommended Stack
+            </h4>
+
+            <div className="space-y-5">
+              {/* The Agent */}
+              <div className="flex gap-4">
+                <div className="flex-shrink-0 w-12 h-12 bg-growth-100 rounded-xl flex items-center justify-center">
                   <svg className="w-6 h-6 text-growth-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                   </svg>
                 </div>
                 <div>
-                  <p className="text-growth-600 text-xs font-semibold uppercase tracking-wide">The Outcome</p>
-                  <p className="font-display text-lg font-semibold text-growth-700">Operational Freedom</p>
-                </div>
-              </div>
-
-              <p className="text-growth-700 mb-5 leading-relaxed">{roadmap?.step3_freedom?.futureState}</p>
-
-              {/* Growth metrics */}
-              <div className="space-y-3">
-                <div className="flex items-center justify-between bg-white/60 rounded-lg px-4 py-3 border border-growth-200/50">
-                  <span className="text-sm text-growth-600">Potential hours recovered</span>
-                  <span className="font-display text-xl font-bold text-growth-600">Up to {roadmap?.step1_automator?.hoursRecovered || 3}h</span>
-                </div>
-                <div className="flex items-center justify-between bg-white/60 rounded-lg px-4 py-3 border border-growth-200/50">
-                  <span className="text-sm text-growth-600">Potential monthly savings</span>
-                  <span className="font-display text-xl font-bold text-growth-600">${(roi?.projectedSavings || 0).toLocaleString()}</span>
-                </div>
-                <div className="flex items-center justify-between bg-white/60 rounded-lg px-4 py-3 border border-growth-200/50">
-                  <span className="text-sm text-growth-600">Revenue goal</span>
-                  <span className="font-display text-xl font-bold text-growth-600">{roi?.goalRevenueLabel || '$50k+'}</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* 3-Step Roadmap */}
-        <div className="mb-12">
-          <div className="text-center mb-8">
-            <span className="inline-flex items-center gap-2 text-sm font-medium text-navy-600 tracking-wide uppercase mb-3">
-              <span className="w-8 h-px bg-navy-300" />
-              Your Roadmap
-              <span className="w-8 h-px bg-navy-300" />
-            </span>
-            <h3 className="font-display text-display-sm text-navy-900">
-              Three Steps to Operational Freedom
-            </h3>
-          </div>
-
-          <div className="space-y-4">
-            {/* Step 1: The Automator */}
-            <div className="card p-6 animate-slide-up" style={{ animationDelay: '0ms' }}>
-              <div className="flex items-start gap-5">
-                <div className="flex-shrink-0">
-                  <div className="w-14 h-14 bg-growth-100 rounded-2xl flex items-center justify-center border-2 border-growth-200">
-                    <span className="font-display text-2xl font-bold text-growth-600">1</span>
-                  </div>
-                </div>
-                <div className="flex-1">
-                  <div className="flex flex-wrap items-center gap-3 mb-2">
-                    <h4 className="font-display text-xl font-semibold text-navy-900">
-                      {roadmap?.step1_automator?.title || "The Automator"}
-                    </h4>
-                    <span className="text-xs bg-growth-100 text-growth-700 px-3 py-1 rounded-full font-semibold">
-                      Quick Win
-                    </span>
-                  </div>
-                  <p className="text-navy-600 mb-4 leading-relaxed">{roadmap?.step1_automator?.description}</p>
-                  <div className="grid sm:grid-cols-2 gap-3">
-                    <div className="bg-growth-50 border border-growth-100 rounded-xl px-4 py-3">
-                      <p className="text-xs text-growth-600 font-medium mb-1">Potential Hours Recovered</p>
-                      <p className="font-display text-2xl font-bold text-growth-700">Up to {roadmap?.step1_automator?.hoursRecovered || 3}h</p>
-                      <p className="text-xs text-growth-500 mt-1">of your reported {roi?.hoursWastedWeekly}h/week</p>
-                    </div>
-                    <div className="bg-cream-100 border border-navy-100 rounded-xl px-4 py-3">
-                      <p className="text-xs text-navy-500 font-medium mb-1">First Action</p>
-                      <p className="text-sm text-navy-700 font-medium">{roadmap?.step1_automator?.implementation}</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Step 2: The Multiplier */}
-            <div className="card p-6 animate-slide-up" style={{ animationDelay: '100ms' }}>
-              <div className="flex items-start gap-5">
-                <div className="flex-shrink-0">
-                  <div className="w-14 h-14 bg-navy-100 rounded-2xl flex items-center justify-center border-2 border-navy-200">
-                    <span className="font-display text-2xl font-bold text-navy-600">2</span>
-                  </div>
-                </div>
-                <div className="flex-1">
-                  <div className="flex flex-wrap items-center gap-3 mb-2">
-                    <h4 className="font-display text-xl font-semibold text-navy-900">
-                      {roadmap?.step2_multiplier?.title || "The Multiplier"}
-                    </h4>
-                    <span className="text-xs bg-navy-100 text-navy-700 px-3 py-1 rounded-full font-semibold">
-                      Scale
-                    </span>
-                  </div>
-                  <p className="text-navy-600 mb-4 leading-relaxed">{roadmap?.step2_multiplier?.description}</p>
-                  <div className="bg-navy-50 border border-navy-100 rounded-xl px-4 py-3">
-                    <p className="text-xs text-navy-500 font-medium mb-1">Expected Impact</p>
-                    <p className="text-navy-800 font-medium">{roadmap?.step2_multiplier?.impact}</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Step 3: The Freedom Phase */}
-            <div className="card-elevated p-6 bg-gradient-to-br from-white to-growth-50/30 animate-slide-up" style={{ animationDelay: '200ms' }}>
-              <div className="flex items-start gap-5">
-                <div className="flex-shrink-0">
-                  <div className="w-14 h-14 bg-navy-900 rounded-2xl flex items-center justify-center">
-                    <span className="font-display text-2xl font-bold text-cream-50">3</span>
-                  </div>
-                </div>
-                <div className="flex-1">
-                  <div className="flex flex-wrap items-center gap-3 mb-2">
-                    <h4 className="font-display text-xl font-semibold text-navy-900">
-                      {roadmap?.step3_freedom?.title || "The Freedom Phase"}
-                    </h4>
-                    <span className="text-xs bg-navy-900 text-cream-50 px-3 py-1 rounded-full font-semibold">
-                      30 Days
-                    </span>
-                  </div>
-                  <p className="text-navy-600 mb-4 leading-relaxed">{roadmap?.step3_freedom?.description}</p>
-                  <div className="bg-white border border-growth-200 rounded-xl px-5 py-4">
-                    <p className="text-xs text-growth-600 font-semibold mb-2 tracking-wide uppercase">Your New Reality</p>
-                    <p className="font-display text-navy-900 font-medium text-lg">{roadmap?.step3_freedom?.futureState}</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* ROI Summary Bar */}
-        <div className="bg-navy-900 rounded-2xl p-6 md:p-8 text-white mb-12 animate-slide-up relative overflow-hidden">
-          {/* Background pattern */}
-          <div className="absolute inset-0 bg-grid-pattern opacity-5" />
-
-          <div className="relative">
-            <h3 className="font-display text-lg font-semibold mb-6 flex items-center gap-3">
-              <div className="w-10 h-10 bg-growth-500/20 rounded-lg flex items-center justify-center">
-                <svg className="w-5 h-5 text-growth-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                </svg>
-              </div>
-              The ROI Case
-            </h3>
-
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-              <div className="bg-white/5 rounded-xl p-4 border border-white/10">
-                <p className="text-navy-300 text-xs mb-1">Hours Lost/Week</p>
-                <p className="font-display text-3xl font-bold text-friction-400">{roi?.hoursWastedWeekly || 15}</p>
-              </div>
-              <div className="bg-white/5 rounded-xl p-4 border border-white/10">
-                <p className="text-navy-300 text-xs mb-1">Your Hourly Value</p>
-                <p className="font-display text-3xl font-bold text-white">${roi?.hourlyValue || 150}</p>
-              </div>
-              <div className="bg-white/5 rounded-xl p-4 border border-white/10">
-                <p className="text-navy-300 text-xs mb-1">Monthly Bleed</p>
-                <p className="font-display text-3xl font-bold text-friction-400">${(roi?.monthlyCostOfBottleneck || 9000).toLocaleString()}</p>
-              </div>
-              <div className="bg-white/5 rounded-xl p-4 border border-white/10">
-                <p className="text-navy-300 text-xs mb-1">Potential Savings</p>
-                <p className="font-display text-3xl font-bold text-growth-400">${(roi?.projectedSavings || 6750).toLocaleString()}</p>
-              </div>
-            </div>
-
-            <div className="bg-gradient-to-r from-growth-500/20 to-growth-600/20 rounded-xl p-5 border border-growth-500/30">
-              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                <div>
-                  <p className="text-growth-300 text-sm font-medium mb-1">Revenue Trajectory</p>
-                  <p className="text-white">
-                    <span className="font-display text-3xl font-bold">{roi?.currentRevenueLabel || '$10k-$25k'}</span>
-                    <svg className="w-6 h-6 inline mx-3 text-growth-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                    </svg>
-                    <span className="font-display text-3xl font-bold text-growth-400">{roi?.goalRevenueLabel || '$50k+'}</span>
-                    <span className="text-navy-300 text-sm ml-2">/month</span>
+                  <h5 className="font-display font-semibold text-navy-900 mb-1">The Agent</h5>
+                  <p className="text-navy-600 text-sm leading-relaxed">
+                    We recommend deploying an autonomous <span className="font-semibold">AI Agent</span> to handle your {constraintLabel.toLowerCase()} workflow.
+                    {roadmap?.step1_automator?.description && (
+                      <span className="block mt-2 text-navy-500">{roadmap.step1_automator.description}</span>
+                    )}
                   </p>
                 </div>
-                <div className="flex items-center gap-2 bg-growth-500/20 text-growth-400 px-5 py-2.5 rounded-full border border-growth-500/30">
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </div>
+
+              {/* The Brain */}
+              <div className="flex gap-4">
+                <div className="flex-shrink-0 w-12 h-12 bg-navy-100 rounded-xl flex items-center justify-center">
+                  <svg className="w-6 h-6 text-navy-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4" />
                   </svg>
-                  <span className="font-semibold">ROI in {roi?.timeToROI || "30-60 days"}</span>
+                </div>
+                <div>
+                  <h5 className="font-display font-semibold text-navy-900 mb-1">The Brain</h5>
+                  <p className="text-navy-600 text-sm leading-relaxed">
+                    We will build a custom logic layer to ensure the data syncs perfectly with your current CRM/Database.
+                  </p>
+                </div>
+              </div>
+
+              {/* The Impact */}
+              <div className="flex gap-4">
+                <div className="flex-shrink-0 w-12 h-12 bg-growth-500 rounded-xl flex items-center justify-center">
+                  <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                </div>
+                <div>
+                  <h5 className="font-display font-semibold text-navy-900 mb-1">The Impact</h5>
+                  <p className="text-navy-600 text-sm leading-relaxed">
+                    This build will replace approximately <span className="font-bold text-growth-600">20–30 hours of human labor per week</span>.
+                  </p>
                 </div>
               </div>
             </div>
+          </div>
+        </section>
 
-            {/* Calculation methodology */}
-            <div className="mt-4 text-xs text-navy-400 space-y-1">
-              <p className="font-medium text-navy-300">How we calculated these numbers:</p>
-              <ul className="list-disc list-inside space-y-0.5 text-navy-400">
-                <li>Using bracket midpoint: {roi?.currentRevenueLabel || 'your range'} → ${(roi?.currentRevenue || 0).toLocaleString()}/mo estimate</li>
-                <li>Hourly value = ${(roi?.currentRevenue || 0).toLocaleString()} / 160 hours = ${roi?.hourlyValue || 0}/hr</li>
-                <li>Monthly cost = {roi?.hoursWastedWeekly}h/week x 4 weeks x ${roi?.hourlyValue}/hr = ${(roi?.monthlyCostOfBottleneck || 0).toLocaleString()}</li>
-                <li>Potential savings = ${(roi?.monthlyCostOfBottleneck || 0).toLocaleString()} x 50% = ${(roi?.projectedSavings || 0).toLocaleString()} (conservative)</li>
-              </ul>
+        {/* Section 3: The Offer - 30-Day Implementation Sprint */}
+        <section className="mb-10 animate-slide-up" style={{ animationDelay: '200ms' }}>
+          <div className="flex items-center gap-3 mb-4">
+            <span className="bg-navy-900 text-cream-50 text-xs font-bold px-3 py-1 rounded-full">03</span>
+            <h3 className="font-display text-xl font-semibold text-navy-900">The Offer</h3>
+          </div>
+
+          <div className="card-elevated p-6 bg-gradient-to-br from-white to-growth-50/30">
+            <h4 className="font-display text-xl font-bold text-navy-900 mb-2">
+              30-Day Implementation Sprint
+            </h4>
+            <p className="text-navy-600 mb-6">
+              We do not offer "coaching." We offer a build.
+            </p>
+
+            <div className="grid sm:grid-cols-2 gap-4">
+              {[
+                { week: 'Week 1', title: 'Process Extraction & Mapping' },
+                { week: 'Week 2', title: 'AI Agent Configuration (Lindy/Claude)' },
+                { week: 'Week 3', title: 'Testing & Integration' },
+                { week: 'Week 4', title: 'Handover & Training' },
+              ].map((item, i) => (
+                <div key={i} className="flex items-start gap-3 p-4 bg-white rounded-xl border border-navy-100">
+                  <div className="flex-shrink-0 w-10 h-10 bg-navy-900 rounded-lg flex items-center justify-center">
+                    <span className="font-display text-sm font-bold text-cream-50">{i + 1}</span>
+                  </div>
+                  <div>
+                    <p className="text-xs text-navy-400 font-semibold uppercase tracking-wide mb-1">{item.week}</p>
+                    <p className="font-medium text-navy-800 text-sm">{item.title}</p>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
-        </div>
+        </section>
 
-        {/* Booking CTA */}
-        <div className="mb-12">
+        {/* Section 4: Call to Action */}
+        <section className="mb-12 animate-slide-up" style={{ animationDelay: '300ms' }}>
+          <div className="flex items-center gap-3 mb-4">
+            <span className="bg-navy-900 text-cream-50 text-xs font-bold px-3 py-1 rounded-full">04</span>
+            <h3 className="font-display text-xl font-semibold text-navy-900">Next Step</h3>
+          </div>
+
           <BookingCTA
             callAgenda={callAgenda}
             topRecommendation={roadmap?.step1_automator?.implementation}
           />
-        </div>
+        </section>
 
         {/* Footer */}
         <div className="text-center py-8 border-t border-navy-100">
           <p className="text-navy-400 text-sm">
-            Powered by <span className="font-display font-medium text-navy-500">Friction Audit</span> AI Analysis
+            Powered by <span className="font-display font-medium text-navy-500">AI Feasibility Scope</span>
           </p>
         </div>
       </main>

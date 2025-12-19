@@ -6,13 +6,15 @@ import Results from './components/Results'
 function App() {
   const [stage, setStage] = useState('landing') // landing | wizard | analyzing | results
   const [analysisData, setAnalysisData] = useState(null)
+  const [wizardData, setWizardData] = useState(null)
 
   const handleStartAssessment = () => {
     setStage('wizard')
   }
 
-  const handleAnalysisComplete = (data) => {
+  const handleAnalysisComplete = (data, formData) => {
     setAnalysisData(data)
+    setWizardData(formData)
     setStage('results')
   }
 
@@ -23,6 +25,7 @@ function App() {
   const handleRestart = () => {
     setStage('landing')
     setAnalysisData(null)
+    setWizardData(null)
   }
 
   return (
@@ -41,6 +44,7 @@ function App() {
       {stage === 'results' && (
         <Results
           data={analysisData}
+          wizardData={wizardData}
           onRestart={handleRestart}
         />
       )}

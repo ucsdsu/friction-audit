@@ -2,12 +2,10 @@ import { useState, useCallback } from 'react'
 import { getAnalysis } from '../lib/api'
 
 const INITIAL_DATA = {
-  dreadTask: '',
-  hoursPerWeek: '',
-  capacityTest: '', // 'grow' or 'break'
-  timeAudit: '',
-  currentRevenue: '',
-  goalRevenue: ''
+  currentRevenue: '',      // Q1: The Scale - annual revenue bracket
+  constraint: '',          // Q2: The Constraint - where business breaks
+  hiringTrap: '',          // Q3: The Hiring Trap - why haven't hired
+  bleedingNeck: '',        // Q4: The Bleeding Neck - specific repetitive task
 }
 
 export function useWizard() {
@@ -56,14 +54,17 @@ export function useWizard() {
   const canProceed = useCallback((currentStep) => {
     switch (currentStep) {
       case 1:
-        const hours = parseInt(data.hoursPerWeek)
-        return data.dreadTask.trim().length >= 10 && hours >= 1 && hours <= 40
+        // The Scale: must select a revenue bracket
+        return !!data.currentRevenue
       case 2:
-        return data.capacityTest === 'grow' || data.capacityTest === 'break'
+        // The Constraint: must select where business breaks
+        return !!data.constraint
       case 3:
-        return data.timeAudit.trim().length > 0
+        // The Hiring Trap: must select why haven't hired
+        return !!data.hiringTrap
       case 4:
-        return data.currentRevenue && data.goalRevenue
+        // The Bleeding Neck: must describe task (min 10 chars)
+        return data.bleedingNeck.trim().length >= 10
       default:
         return false
     }
