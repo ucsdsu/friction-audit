@@ -200,7 +200,7 @@ export default function Results({ data, onRestart, wizardData }) {
         {/* Footer */}
         <div className="text-center py-8 border-t border-navy-100">
           <p className="text-navy-400 text-sm">
-            Powered by <span className="font-display font-medium text-navy-500">AI Feasibility Scope</span>
+            Powered by <span className="font-display font-medium text-navy-500">The AI Implementation Blueprint</span>
           </p>
         </div>
       </main>

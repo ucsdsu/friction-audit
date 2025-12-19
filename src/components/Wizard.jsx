@@ -39,7 +39,7 @@ export default function Wizard({ onComplete, onStartAnalyzing }) {
               </svg>
             </div>
             <div>
-              <h1 className="font-display font-semibold text-navy-900">AI Feasibility Scope</h1>
+              <h1 className="font-display font-semibold text-navy-900">The AI Implementation Blueprint</h1>
               <p className="text-xs text-navy-500">Operational Assessment</p>
             </div>
           </div>

@@ -17,7 +17,7 @@ export default function Landing({ onStart }) {
                 <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
             </div>
-            <span className="font-display font-semibold text-xl text-navy-900">AI Feasibility Scope</span>
+            <span className="font-display font-semibold text-xl text-navy-900">The AI Implementation Blueprint</span>
           </div>
 
           <div className="hidden sm:flex items-center gap-2 text-sm text-navy-500">
@@ -84,7 +84,7 @@ export default function Landing({ onStart }) {
               onClick={onStart}
               className="btn-primary text-lg group"
             >
-              Initialize Feasibility Scope
+              Build My Blueprint
               <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
               </svg>
