@@ -44,23 +44,25 @@ export default function Wizard({ onComplete, onStartAnalyzing }) {
             </div>
           </div>
 
-          {/* Progress indicator */}
-          <div className="flex items-center gap-3">
-            <span className="text-xs text-navy-400 hidden sm:block">
-              Step {step} of {totalSteps}
-            </span>
-            <div className="flex gap-1.5">
-              {[1, 2, 3, 4].map((s) => (
-                <div
-                  key={s}
-                  className={`step-indicator ${
-                    step > s ? 'completed' :
-                    step === s ? 'active' : 'pending'
-                  }`}
-                />
-              ))}
+          {/* Progress indicator - hide on processing screen */}
+          {step <= totalSteps && (
+            <div className="flex items-center gap-3">
+              <span className="text-xs text-navy-400 hidden sm:block">
+                Step {step} of {totalSteps}
+              </span>
+              <div className="flex gap-1.5">
+                {[1, 2, 3, 4].map((s) => (
+                  <div
+                    key={s}
+                    className={`step-indicator ${
+                      step > s ? 'completed' :
+                      step === s ? 'active' : 'pending'
+                    }`}
+                  />
+                ))}
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </header>
 
