@@ -1,4 +1,4 @@
-const BOOKING_URL = import.meta.env.VITE_BOOKING_URL || 'https://cal.com/jon-stenstrom/15min?overlayCalendar=true'
+const BOOKING_URL = import.meta.env.VITE_BOOKING_URL || 'https://cal.com/jon-stenstrom-ai/ai-consultation?overlayCalendar=true'
 
 export default function BookingCTA({ callAgenda, topRecommendation }) {
   return (
