@@ -1,10 +1,36 @@
 import express from 'express'
 import path from 'path'
 import { fileURLToPath } from 'url'
+import pg from 'pg'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const app = express()
 const PORT = process.env.PORT || 3000
+
+// Database setup
+const pool = process.env.DATABASE_URL
+  ? new pg.Pool({ connectionString: process.env.DATABASE_URL, ssl: { rejectUnauthorized: false } })
+  : null
+
+async function initDb() {
+  if (!pool) return
+  try {
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS submissions (
+        id SERIAL PRIMARY KEY,
+        created_at TIMESTAMPTZ DEFAULT NOW(),
+        revenue TEXT,
+        constraint_area TEXT,
+        hiring_trap TEXT,
+        bleeding_neck TEXT
+      )
+    `)
+    console.log('Database initialized')
+  } catch (err) {
+    console.error('Database init error:', err)
+  }
+}
+initDb()
 
 app.use(express.json())
 app.use(express.static(path.join(__dirname, 'dist')))
@@ -43,6 +69,18 @@ app.post('/api/analyze', async (req, res) => {
 
   if (!apiKey) {
     return res.status(500).json({ error: 'GEMINI_API_KEY not set' })
+  }
+
+  // Log submission to database
+  if (pool) {
+    try {
+      await pool.query(
+        `INSERT INTO submissions (revenue, constraint_area, hiring_trap, bleeding_neck) VALUES ($1, $2, $3, $4)`,
+        [currentRevenue, constraint, hiringTrap, bleedingNeck]
+      )
+    } catch (err) {
+      console.error('Failed to log submission:', err)
+    }
   }
 
   const constraintLabel = CONSTRAINT_LABELS[constraint] || 'operational'
