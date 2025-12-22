@@ -87,6 +87,27 @@ app.post('/api/analyze', async (req, res) => {
   const hiringLabel = HIRING_TRAP_LABELS[hiringTrap] || 'a hiring challenge'
   const revenueLabel = REVENUE_LABELS[currentRevenue]?.label || currentRevenue
 
+  // Send email notification
+  if (process.env.RESEND_API_KEY) {
+    try {
+      await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          from: 'onboarding@resend.dev',
+          to: 'jestenstrom@gmail.com',
+          subject: `New Lead: ${revenueLabel} - ${constraintLabel}`,
+          text: `New submission from AI Implementation Blueprint:\n\nRevenue: ${revenueLabel}\nConstraint Area: ${constraintLabel}\nWhy Haven't Hired: ${hiringLabel}\nBleeding Neck Task: ${bleedingNeck}`
+        })
+      })
+    } catch (err) {
+      console.error('Failed to send email notification:', err)
+    }
+  }
+
   const analysisPrompt = `You are a business strategist analyzing a business owner's workflow constraints for an AI automation feasibility assessment.
 
 INPUTS:
